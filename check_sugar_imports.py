@@ -66,12 +66,14 @@ def check_complete_headers(headers, file):
 
 def check_duplicate_headers(headers, file):
 	duplicate_headers = {}
-	indeces = [i for i, header in enumerate(headers) if re.search('(\.\d+)$', header)]
-	if len(indeces) <= 0:
-		return
-	duplicate_headers = {(headers[x],x+1) for x in indeces}
-	for header,col in duplicate_headers:
-		header_status[DUPLICATE].append("DULPICATE HEADER: COLUMN {} ({}): {}".format(col, header.split('.')[0], file))
+	tuple_header_index = [i for i in enumerate(headers)]
+	for column, header in tuple_header_index:		
+		if re.search('(\.\d+)$', header):
+			my_header = re.sub('(\.\d+)$','', header)
+			index = str(column+1).zfill(2)
+			duplicate_headers[index] = my_header	
+	for index in duplicate_headers:
+		header_status[DUPLICATE].append("DULPICATE HEADER: COLUMN {} ({}): {}".format(index, duplicate_headers[index], file))
 	if file in header_status[PASS]:
 		header_status[PASS].remove(file)
 
