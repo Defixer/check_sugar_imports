@@ -7,10 +7,10 @@ CONTACT_ROLES = 'CONTACT_ROLES'
 
 import_report_df = pd.DataFrame()
 
-def check_contact_roles(this_import_report_df, my_data):
+def check_contact_roles(this_import_report_df, files):
 	global import_report_df
 	import_report_df = this_import_report_df
-	file = my_data['files'][0]
+	file = files[0]
 	current_date = datetime.today().strftime('%Y%m%d')	
 	csv_data_frame = pd.read_csv(file, encoding="ISO-8859-1")	
 	csv_data_frame = remove_empty_columns(csv_data_frame)
@@ -47,4 +47,4 @@ def trim_spaces(items):
 	return my_items
 
 if __name__ == "__check_contact_roles__": #allows to run only when called from another file, not during import
-	check_contact_roles(this_import_report_df, my_data)
+	check_contact_roles(this_import_report_df, files)

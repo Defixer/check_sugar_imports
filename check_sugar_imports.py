@@ -26,17 +26,19 @@ CONTACT_ROLES = 'CONTACT_ROLES'
 
 def main():
 	current_date = datetime.today().strftime('%Y%m%d')	
-	my_data = utilities.get_data(USERS)
-	files = my_data['files']
+	root_directory = utilities.get_root_dir()
+	file_directory = "{}/{}".format(root_directory, USERS)
+	files = utilities.get_data(file_directory)
 	import_report_df = check_users(files)
 
 	# t = threading.Thread(target=animate)
 	# t.start()
-	my_data = utilities.get_data(CONTACT_ROLES)
-	import_report_df = check_contact_roles(import_report_df, my_data)
+	file_directory = "{}/{}".format(root_directory, CONTACT_ROLES)
+	files = utilities.get_data(file_directory)
+	import_report_df = check_contact_roles(import_report_df, files)
 	# time.sleep(5)
 	# done = True
-	output_file = "{}/{}_import_results.csv".format(my_data['root_directory'], current_date)	
+	output_file = "{}/{}_import_results.csv".format(root_directory, current_date)	
 	utilities.df_to_csv(import_report_df, output_file)
 	
 main()
