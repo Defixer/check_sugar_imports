@@ -7,35 +7,20 @@ PASS = 'PASS'
 MISSING = 'MISSING'
 DUPLICATE = 'DUPLICATE'
 EMPTY = 'EMPTY'
-WARNING = 'WARNING'
 CONTACT_ROLES = 'CONTACT ROLES'
-USERS = 'USERS'
 USER_HEADERS = ['ADID', 'FIRST NAME', 'LAST NAME', 'FULL NAME', 'EMAIL ADDRESS', 'SUPERVISOR ADID', 'ECRM ROLE 1', 'ECRM ROLE 2', 'GROUP', 'DIVISION', 'TEAM', 'COMPANY']
 REQUIRED_USER_HEADERS = ['ADID', 'SUPERVISOR ADID', 'ECRM ROLE 1']
 TEAM_NAME = ['GROUP','DIVISION','TEAM','COMPANY']
 UNIQUE_HEADERS = ['ADID', 'EMAIL ADDRESS', 'FULL NAME']
 
-def check_users():
-	files = utilities.get_files(USERS)
-	filenames = [file.rsplit('/', 1)[1] for file in files]
-	utilities.import_report_df[PASS] = pd.Series(filenames)
+import_report_df = utilities.import_report_df
+
+def check_users(files):
+	global import_report_df
+	filenames = [file.rsplit('/', 1)[1] for file in files]	
+	import_report_df[PASS] = pd.Series(filenames)
 	files_to_data_frame(files)
-	return utilities.import_report_df	
-
-def reload_import_report_df(errors):
-	utilities.import_report_df = pd.concat([pd.Series(errors[i]) for i in errors], keys=(PASS,MISSING,DUPLICATE,EMPTY,WARNING), axis=1)
-
-def reload_statuses():
-	status = {
-		PASS: [],
-		MISSING: [],
-		DUPLICATE: [],
-		EMPTY: [],
-		WARNING: []
-	}
-	for i in status:
-		status[i] = utilities.import_report_df[i].dropna().tolist()
-	return status
+	return import_report_df	
 
 def files_to_data_frame(files):
 	for file in files:
@@ -52,7 +37,8 @@ def check_headers(headers, file):
 	check_duplicate_headers(headers, file)
 
 def check_missing_headers(headers, file):	
-	status = reload_statuses()
+	global import_report_df
+	status = utilities.reload_statuses(import_report_df)
 	i = 0
 	while i < len(USER_HEADERS)-1: #check if headers match the template
 		if USER_HEADERS[i] not in headers:	
@@ -61,10 +47,11 @@ def check_missing_headers(headers, file):
 			if filename in status[PASS]:
 				status[PASS].remove(filename)
 		i+=1
-	reload_import_report_df(status)
+	import_report_df = utilities.reload_df(status)
 
 def check_duplicate_headers(headers, file):
-	status = reload_statuses()
+	global import_report_df
+	status = utilities.reload_statuses(import_report_df)
 	duplicate_headers = {}
 	tuple_header_index = [i for i in enumerate(headers)] #creats a tuple of (column index, header name)
 	for column, header in tuple_header_index:		
@@ -77,19 +64,20 @@ def check_duplicate_headers(headers, file):
 		status[DUPLICATE].append("HEADER: COLUMN {} ({}): {}".format(index, duplicate_headers[index], filename))
 		if file in status[PASS]:
 			status[PASS].remove(file)
-	reload_import_report_df(status)
+	import_report_df = utilities.reload_df(status)
 
 def check_users_data(headers, csv_data_frame, file):
 	check_missing_data(headers, csv_data_frame, file)
 	check_duplicate_data(headers, csv_data_frame, file)
 
 def check_missing_data(headers, csv_data_frame, file):
+	global import_report_df
 	global TEAM_NAME
 	required_cols = []
 	team_cols = []
 	data_column = []
 	last_row = csv_data_frame.index[-1]+1
-	status = reload_statuses()
+	status = utilities.reload_statuses(import_report_df)
 
 
 	for name in TEAM_NAME: #get column index of group, division, team, company
@@ -132,12 +120,13 @@ def check_missing_data(headers, csv_data_frame, file):
 				if filename in status[PASS]:
 					status[PASS].remove(filename)
 			i += 1
-	reload_import_report_df(status)
+	import_report_df = utilities.reload_df(status)
 
 def check_duplicate_data(headers, csv_data_frame, file):
+	global import_report_df
 	global UNIQUE_HEADERS
 	unique_cols = []
-	status = reload_statuses()
+	status = utilities.reload_statuses(import_report_df)
 	for unique_header in UNIQUE_HEADERS:
 		try:
 			unique_cols.append((headers.index(unique_header), unique_header))
@@ -152,7 +141,7 @@ def check_duplicate_data(headers, csv_data_frame, file):
 				status[DUPLICATE].append("{}: {}: {}".format(header, data, filename))
 				if filename in status[PASS]:
 					status[PASS].remove(filename)
-	reload_import_report_df(status)
+	import_report_df = utilities.reload_df(status)
 
 if __name__ == "__check_users__": #allows to run only when called from another file, not during import
-	check_users()
+	check_users(files)
