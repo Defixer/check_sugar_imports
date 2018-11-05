@@ -24,7 +24,7 @@ def check_users(files):
 
 def files_to_data_frame(files):
 	for file in files:
-		csv_data_frame = pd.read_csv(file, encoding="ISO-8859-1")
+		csv_data_frame = pd.read_csv(file, encoding="ISO-8859-1", low_memory=False)
 		do_checks(csv_data_frame, file)
 
 def do_checks(csv_data_frame, file):

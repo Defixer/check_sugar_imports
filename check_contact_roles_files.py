@@ -12,7 +12,7 @@ def check_contact_roles(this_import_report_df, files):
 	import_report_df = this_import_report_df
 	file = files[0]
 	current_date = datetime.today().strftime('%Y%m%d')	
-	csv_data_frame = pd.read_csv(file, encoding="ISO-8859-1")	
+	csv_data_frame = pd.read_csv(file, encoding="ISO-8859-1", low_memory=False)	
 	csv_data_frame = remove_empty_columns(csv_data_frame)
 	headers = [line for line in csv_data_frame]
 	headers = remove_carriage_return(headers)
