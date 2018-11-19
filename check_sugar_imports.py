@@ -28,16 +28,16 @@ def animate():
 		time.sleep(0.3)
 
 def main():
+	global done
 	t = threading.Thread(target=animate)
 	t.start()
 	
-	global done
 	current_date = datetime.today().strftime('%Y%m%d')	
 	root_directory = utilities.get_root_dir()
 	file_directory = "{}/{}".format(root_directory, USERS)
 	files = utilities.get_data(file_directory)
 	import_report_df = check_users(files)
-	print("\n\tDONE: Check Users import")	
+	print("\tDONE: Check Users import")	
 	
 	file_directory = "{}/{}".format(root_directory, CONTACT_ROLES)
 	files = utilities.get_data(file_directory)
@@ -52,7 +52,7 @@ def main():
 	output_file = "{}/{}_import_results.csv".format(root_directory, current_date)	
 	utilities.df_to_csv(import_report_df, output_file)
 	done = True
-	print("IMPORT REPORT: {}".format(output_file))
+	print("\nIMPORT REPORT: {}".format(output_file))
 	os.system("open {}".format(output_file))
 
 main()

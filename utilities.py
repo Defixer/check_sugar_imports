@@ -11,8 +11,9 @@ MISSING = 'MISSING'
 DUPLICATE = 'DUPLICATE'
 EMPTY = 'EMPTY'
 CONTACT_ROLES = 'CONTACT_ROLES'
+DO_NOT_TAGGING = 'DO_NOT_TAGGING'
 
-import_report_df = pd.DataFrame(columns=(PASS, MISSING, DUPLICATE, EMPTY, CONTACT_ROLES))
+import_report_df = pd.DataFrame(columns=(PASS, MISSING, DUPLICATE, EMPTY, CONTACT_ROLES, DO_NOT_TAGGING))
 
 application_window = tk.Tk()
 application_window.withdraw() #hides the root window
@@ -33,7 +34,7 @@ def df_to_csv(data_frame, output_file):
 
 def reload_df(errors):
 	import_report_df = pd.concat([pd.Series(errors[i]) for i in errors], 
-											keys=(PASS,MISSING,DUPLICATE,EMPTY,CONTACT_ROLES), axis=1)
+											keys=(PASS,MISSING,DUPLICATE,EMPTY,CONTACT_ROLES, DO_NOT_TAGGING), axis=1)
 	return import_report_df
 
 def reload_statuses(import_report_df):
@@ -42,7 +43,8 @@ def reload_statuses(import_report_df):
 		MISSING: [],
 		DUPLICATE: [],
 		EMPTY: [],
-		CONTACT_ROLES: []
+		CONTACT_ROLES: [],
+		DO_NOT_TAGGING: []
 	}
 	for i in status:
 		status[i] = import_report_df[i].dropna().tolist()
